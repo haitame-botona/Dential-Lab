@@ -1,26 +1,161 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* Dark regions opt in with data-theme="dark" on any wrapper. */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+/* ---------------------------------------------------------------------------
+   1. PRIMITIVES — raw values. Swap this block to rebrand.
+   --------------------------------------------------------------------------- */
+@theme {
+  --color-neutral-0: #ffffff;
+  --color-neutral-50: #f7f7f8;
+  --color-neutral-100: #ededef;
+  --color-neutral-200: #d9d9de;
+  --color-neutral-300: #b8b8c0;
+  --color-neutral-400: #8b8b95;
+  --color-neutral-500: #64646e;
+  --color-neutral-600: #4a4a53;
+  --color-neutral-700: #34343b;
+  --color-neutral-800: #1f1f24;
+  --color-neutral-900: #121215;
+  --color-neutral-950: #000000;
+
+  /* Chromatic hues are rationed: blue enumerates, green confirms,
+     clay marks what the pack already covers at no extra cost. */
+  --color-blue-400: #60a5fa;
+  --color-blue-500: #3b82f6;
+  --color-green-100: #dcfce7;
+  --color-green-500: #22c55e;
+  --color-clay-500: #e0533c;
+
+  /* Fluid type scale — min at 375px viewport, max at 1440px. */
+  --text-fine: clamp(0.75rem, 0.72rem + 0.13vw, 0.8125rem); /* 12 → 13 */
+  --text-sm: clamp(0.8125rem, 0.78rem + 0.14vw, 0.9375rem); /* 13 → 15 */
+  --text-base: clamp(0.9375rem, 0.9rem + 0.16vw, 1.0625rem); /* 15 → 17 */
+  --text-caption: clamp(0.8125rem, 0.79rem + 0.09vw, 0.875rem); /* 13 → 14 */
+  --text-label: clamp(0.875rem, 0.84rem + 0.19vw, 1rem); /* 14 → 16 */
+  --text-title: clamp(1.125rem, 1.06rem + 0.28vw, 1.25rem); /* 18 → 20 */
+  --text-stat: clamp(2.25rem, 1.16rem + 4.66vw, 3.75rem); /* 36 → 60 */
+  --text-heading: clamp(1.75rem, 1.2rem + 2.33vw, 2.5rem); /* 28 → 40 */
+  --text-display: clamp(2rem, 1.65rem + 1.5vw, 3rem); /* 32 → 48 */
+
+  --tracking-tight: -0.04em;
+  --tracking-tighter: -0.06em;
+
+  --leading-display: 1.25;
+  --leading-relaxed: 1.45;
+
+  /* Motion — mirrored in lib/motion.ts for GSAP. Keep the two in sync. */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+  --duration-fast: 200ms;
+  --duration-base: 400ms;
+  --duration-slow: 900ms;
+
+  /* Layout */
+  --spacing-gutter: clamp(1.25rem, -0.35rem + 6.83vw, 4.125rem); /* 20 → 66 */
+  --spacing-section: clamp(4rem, 2.44rem + 6.67vw, 7.5rem); /* 64 → 120 */
+  --container-canvas: 1440px;
+}
+
+/* ---------------------------------------------------------------------------
+   2. SEMANTIC LAYER — components only ever reference these names.
+   --------------------------------------------------------------------------- */
+/* [data-theme="light"] is listed alongside :root so a light island can sit
+   inside a dark region — the configurator's white recap card on black. */
+:root,
+[data-theme="light"] {
+  --surface: var(--color-neutral-0);
+  --surface-raised: var(--color-neutral-50);
+  --ink: var(--color-neutral-950);
+  --ink-muted: --alpha(var(--color-neutral-950) / 70%);
+  --ink-subtle: --alpha(var(--color-neutral-950) / 66%);
+  /* Eyebrows and other de-emphasised labels. */
+  --ink-faint: --alpha(var(--color-neutral-950) / 32%);
+  --border-subtle: --alpha(var(--color-neutral-950) / 15%);
+  /* Hairline rules between content — quieter than an interactive border. */
+  --rule: --alpha(var(--color-neutral-950) / 12%);
+  --accent: var(--color-neutral-950);
+  --accent-ink: var(--color-neutral-0);
+  /* Ordinal markers ("01", "02"…) — the one place colour carries meaning. */
+  --marker: var(--color-blue-500);
+  /* Ticked-off checklist affordances. The glyph itself ships as an exported
+     SVG with the green baked in, so this only backs it. */
+  --confirm-surface: var(--color-green-100);
+  /* Price slot for a line the pack already covers — "Inclus d'office".
+     Reads as a price, so it must not be mistaken for muted body copy. */
+  --included: var(--color-clay-500);
+}
+
+[data-theme="dark"] {
+  --surface: var(--color-neutral-950);
+  --surface-raised: var(--color-neutral-900);
+  --ink: var(--color-neutral-0);
+  --ink-muted: --alpha(var(--color-neutral-0) / 90%);
+  --ink-subtle: --alpha(var(--color-neutral-0) / 66%);
+  --ink-faint: --alpha(var(--color-neutral-0) / 40%);
+  --border-subtle: --alpha(var(--color-neutral-0) / 20%);
+  --rule: --alpha(var(--color-neutral-0) / 12%); /* #201f1f on black */
+  --accent: var(--color-neutral-0);
+  --accent-ink: var(--color-neutral-950);
+  --marker: var(--color-blue-400);
+  /* The baked-in green glyph needs a darker bed to stay legible on black. */
+  --confirm-surface: --alpha(var(--color-green-500) / 18%);
+  --included: var(--color-clay-500);
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-surface: var(--surface);
+  --color-surface-raised: var(--surface-raised);
+  --color-ink: var(--ink);
+  --color-ink-muted: var(--ink-muted);
+  --color-ink-subtle: var(--ink-subtle);
+  --color-ink-faint: var(--ink-faint);
+  --color-border-subtle: var(--border-subtle);
+  --color-rule: var(--rule);
+  --color-accent: var(--accent);
+  --color-accent-ink: var(--accent-ink);
+  --color-marker: var(--marker);
+  --color-confirm-surface: var(--confirm-surface);
+  --color-included: var(--included);
+  --color-confirm: var(--color-green-500);
+
+  --font-display: var(--font-poppins), ui-sans-serif, system-ui, sans-serif;
+  --font-body: var(--font-hanken), ui-sans-serif, system-ui, sans-serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/* ---------------------------------------------------------------------------
+   3. BASE
+   --------------------------------------------------------------------------- */
+@layer base {
+  html {
+    /* Lenis drives scrolling; native smooth scroll would fight it. */
+    scroll-behavior: auto;
+  }
+
+  body {
+    background-color: var(--color-surface);
+    color: var(--color-ink);
+    font-family: var(--font-body);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  ::selection {
+    background-color: var(--color-ink);
+    color: var(--color-surface);
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* Lenis requirements. */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
 }
