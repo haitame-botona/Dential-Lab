@@ -6,6 +6,7 @@ import { Frictions } from "@/components/sections/Frictions";
 import { PackContents } from "@/components/sections/PackContents";
 import { Deliverables } from "@/components/sections/Deliverables";
 import { Configurator } from "@/components/sections/Configurator";
+import { Footer } from "@/components/sections/Footer";
 
 export default function Home() {
   return (
@@ -18,6 +19,7 @@ export default function Home() {
       <PackContents />
       <Deliverables />
       <Configurator />
+      <Footer />
     </main>
   );
 }

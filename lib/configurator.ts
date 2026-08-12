@@ -176,41 +176,60 @@ export const OPTIONS: Choice[] = [
   },
 ];
 
-/** What the user has picked. Steps 1–3 are one-of-many, step 4 is a set. */
+/**
+ * What the user has picked. Steps 1–3 are one-of-many, step 4 is a set.
+ *
+ * The first three are nullable because the configurator opens locked down:
+ * nothing is pre-picked, so nothing is priced. `null` is "not answered yet",
+ * which is what the recap renders as an em dash.
+ */
 export type Configuration = {
-  caseType: string;
-  brand: string;
-  material: string;
+  caseType: string | null;
+  brand: string | null;
+  material: string | null;
   options: string[];
 };
 
 /**
- * Opening state. Steps 1–3 default to the design's first / included row.
+ * Opening state. Steps 1–3 are unanswered — the clinician chooses from the
+ * three selects before any figure appears, so the estimate is never a number
+ * the lab did not actually agree to.
  *
  * Step 4 starts with only the locked option on. The mockup shows "Maquillage"
  * pre-ticked too, but a paid add-on that arrives already selected quietly
  * inflates the first price the clinician sees, so it starts off. Add its id
  * here if the lab does want it opted-in by default.
  */
-export const DEFAULT_CONFIGURATION: Configuration = {
-  caseType: CASE_TYPES[0].id,
-  brand: "marque-b",
-  material: MATERIALS[0].id,
+export const EMPTY_CONFIGURATION: Configuration = {
+  caseType: null,
+  brand: null,
+  material: null,
   options: OPTIONS.filter((option) => option.locked).map((option) => option.id),
 };
 
-const byId = <T extends { id: string }>(list: T[], id: string) =>
-  list.find((entry) => entry.id === id) ?? list[0];
+const byId = <T extends { id: string }>(list: T[], id: string | null) =>
+  list.find((entry) => entry.id === id) ?? null;
 
-export function computeTotal(configuration: Configuration): number {
+/** The running sum of the paid add-ons, which price on their own from step 1. */
+const optionsTotal = (configuration: Configuration) =>
+  OPTIONS.filter((option) => configuration.options.includes(option.id)).reduce(
+    (sum, option) => sum + option.delta,
+    0,
+  );
+
+/**
+ * The pack estimate, or `null` while any of steps 1–3 is unanswered — a
+ * partial configuration has no honest price, so it gets no number at all.
+ */
+export function computeTotal(configuration: Configuration): number | null {
   const caseType = byId(CASE_TYPES, configuration.caseType);
   const brand = byId(IMPLANT_BRANDS, configuration.brand);
   const material = byId(MATERIALS, configuration.material);
-  const options = OPTIONS.filter((option) =>
-    configuration.options.includes(option.id),
-  ).reduce((sum, option) => sum + option.delta, 0);
+  if (!caseType || !brand || !material) return null;
 
-  return caseType.base + brand.delta + material.delta + options;
+  return (
+    caseType.base + brand.delta + material.delta + optionsTotal(configuration)
+  );
 }
 
 /** Everything the recap card renders, derived — never stored. */
@@ -245,12 +264,16 @@ export function formatDelta(choice: Choice): string {
  * back what was configured instead of the clinician retyping it.
  */
 export function toSearchParams(configuration: Configuration): string {
-  const params = new URLSearchParams({
+  const params = new URLSearchParams();
+  const entries = {
     cas: configuration.caseType,
     marque: configuration.brand,
     materiau: configuration.material,
-    total: String(computeTotal(configuration)),
-  });
+    total: computeTotal(configuration)?.toString() ?? null,
+  };
+  for (const [key, value] of Object.entries(entries)) {
+    if (value) params.set(key, value);
+  }
   if (configuration.options.length) {
     params.set("options", configuration.options.join(","));
   }

@@ -65,15 +65,6 @@ const stages: Stage[] = [
   },
 ];
 
-/**
- * The bar's own gradient, lifted from the design. It lives on the fill element
- * rather than the track so the whole spectrum stays visible at every width —
- * scaleX stretches the gradient with the box, which is also why the fill is
- * animated with a transform instead of `width` (no layout on every frame).
- */
-const FILL_GRADIENT =
-  "linear-gradient(270deg, rgb(254,105,5) 1.5%, rgb(188,34,131) 34.5%, rgb(105,85,223) 53%, rgb(53,169,233) 82%, rgb(230,230,230) 100%)";
-
 /** Opacity of a stage that has not been reached yet. */
 const DIM = 0.32;
 
@@ -168,7 +159,7 @@ export function Deliverables() {
     >
       <div className="mx-auto flex w-full max-w-canvas flex-col gap-12">
         <div className="flex flex-col items-start gap-6">
-          <p className="text-fine leading-[1.1] uppercase text-ink-faint">
+          <p className="text-fine leading-[1.1] uppercase text-marker">
             Ce que nous livrons
           </p>
           <h2 className="max-w-[519px] font-display text-heading leading-display font-medium tracking-tight text-ink">
@@ -176,8 +167,8 @@ export function Deliverables() {
           </h2>
         </div>
 
-        <ol className="grid grid-cols-1 gap-x-3 gap-y-12 sm:grid-cols-2 lg:grid-cols-4">
-          {stages.map((stage) => (
+        <ol className="grid grid-cols-1 gap-x-6 gap-y-12 sm:grid-cols-2 lg:grid-cols-4">
+          {stages.map((stage, i) => (
             <li
               key={stage.step}
               data-stage
@@ -187,7 +178,7 @@ export function Deliverables() {
                 {stage.step}
               </p>
 
-              <div className="relative aspect-video w-full overflow-hidden rounded-[4px] bg-surface-raised">
+              <div className="relative aspect-video w-full overflow-hidden rounded-xl bg-surface-raised lg:aspect-auto lg:h-[130px]">
                 <Image
                   src={stage.image}
                   alt={stage.alt}
@@ -201,13 +192,16 @@ export function Deliverables() {
                   where the reader is, so screen readers skip the bar. */}
               <div
                 aria-hidden
-                className="h-[6px] w-full overflow-hidden bg-surface-raised"
+                className={[
+                  // Stacked, each rail is its own pill. From lg the four sit in
+                  // a row and read as one continuous bar, so only the outer
+                  // ends of the row keep their corners.
+                  "h-[6px] w-full overflow-hidden rounded-xl bg-surface-raised lg:rounded-none",
+                  i === 0 ? "lg:rounded-l-xl" : "",
+                  i === stages.length - 1 ? "lg:rounded-r-xl" : "",
+                ].join(" ")}
               >
-                <div
-                  data-fill
-                  className="h-full w-full"
-                  style={{ backgroundImage: FILL_GRADIENT }}
-                />
+                <div data-fill className="h-full w-full bg-marker" />
               </div>
 
               <div className="flex w-full flex-col gap-2">

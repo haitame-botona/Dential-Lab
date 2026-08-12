@@ -13,29 +13,35 @@ const links = [
   { label: "Configurateur", href: "#configurateur" },
 ];
 
-/** Figma 16:57 / 16:58 — 1×24 hairline, near-black at 12% in hard-light. */
+/**
+ * Figma 19:898 / 19:920 — 1×20 hairline, near-black in hard-light. It sits at
+ * 8% on the white pill and 12% on the glass one, where it has more to cut
+ * through.
+ */
 function Divider() {
   return (
     <span
       aria-hidden
-      className="hidden h-6 w-px shrink-0 bg-[#090909]/12 mix-blend-hard-light md:block"
+      className="hidden h-5 w-px shrink-0 bg-[#090909]/8 mix-blend-hard-light md:block dark:bg-[#090909]/12"
     />
   );
 }
 
 /**
- * Floating pill nav (Figma node 3:77). It is a sibling frame layered over the
+ * Floating pill nav (Figma node 19:932). It is a sibling frame layered over the
  * Hero, horizontally centred and 32px from the top — it has no full-bleed bar,
- * only a translucent blurred capsule. It scrolls away with the page rather than
- * sticking.
+ * only a capsule. It stays fixed and swaps between two states as the page
+ * changes colour behind it.
  */
 export function Navbar() {
   /**
-   * Over the hero and the (dark) stats block the pill is barely-there glass.
-   * Once the stats section clears the top of the viewport the page turns light
-   * behind it, so it fills in solid black to keep the white type legible.
+   * Figma gives the pill two states. Over the hero and the (dark) stats block
+   * it is the "Dark" one: barely-there glass, white type. Once the stats
+   * section clears the top of the viewport the page turns light behind it, so
+   * it becomes the "Light" one — opaque white, lifted off the page by a wide
+   * soft shadow, with the type inverted and the CTA switching to blue.
    */
-  const [solid, setSolid] = useState(false);
+  const [light, setLight] = useState(false);
 
   useGSAP(() => {
     const stats = document.querySelector("#stats");
@@ -50,8 +56,8 @@ export function Navbar() {
       // drop back to glass as soon as it got there.
       start: "bottom top",
       end: "+=1",
-      onEnter: () => setSolid(true),
-      onLeaveBack: () => setSolid(false),
+      onEnter: () => setLight(true),
+      onLeaveBack: () => setLight(false),
     });
 
     return () => trigger.kill();
@@ -59,12 +65,17 @@ export function Navbar() {
 
   return (
     <header
-      data-theme="dark"
+      data-theme={light ? "light" : "dark"}
       className="fixed inset-x-0 top-8 z-50 flex justify-center px-gutter"
     >
       <div
-        className={`flex items-center gap-6 rounded-lg py-2 pr-2 pl-3 backdrop-blur-[6px] transition-colors duration-(--duration-base) ease-(--ease-out-quart) ${
-          solid ? "bg-black" : "bg-black/12"
+        className={`flex items-center gap-6 rounded-full py-2 pr-2 pl-4 backdrop-blur-[6px] transition-[background-color,box-shadow] duration-(--duration-base) ease-(--ease-out-quart) ${
+          light
+            ? // The CTA is the one button on the page that is blue rather than
+              // black, so it is expressed as a local accent override instead of
+              // a one-off Button variant.
+              "bg-surface shadow-[0_4px_72px_-10px_rgba(0,0,0,0.09)] [--accent-ink:var(--color-neutral-0)] [--accent:var(--color-blue-600)]"
+            : "bg-black/12"
         }`}
       >
         <Link
@@ -93,7 +104,7 @@ export function Navbar() {
               <li key={link.href}>
                 <a
                   href={link.href}
-                  className="font-display text-fine tracking-tighter text-ink transition-opacity duration-(--duration-fast) hover:opacity-70"
+                  className="font-display text-fine tracking-tighter text-ink-subtle transition-opacity duration-(--duration-fast) hover:opacity-70 dark:text-ink"
                 >
                   {link.label}
                 </a>
@@ -107,10 +118,17 @@ export function Navbar() {
         <Button
           href="#envoyer-un-cas"
           variant="solid"
+          shape="pill"
           icon={
             <span className="flex size-[14px] shrink-0 items-center justify-center">
+              {/* The chevron ships with its stroke baked in, so the two states
+                  need two exports rather than a currentColor swap. */}
               <Image
-                src="/icons/arrow-up-right.svg"
+                src={
+                  light
+                    ? "/icons/arrow-up-right-on-accent.svg"
+                    : "/icons/arrow-up-right.svg"
+                }
                 alt=""
                 width={5}
                 height={8}

@@ -8,11 +8,12 @@ type Friction = {
   title: string;
   body: string;
   /**
-   * Animated icon. Left undefined for now: the slot renders the neutral
-   * placeholder from the design until the real icons exist. Drop a Lottie,
-   * inline SVG or <video> in here and nothing else needs to change.
+   * Animated asset filling the card's upper half. Left undefined for now: the
+   * slot renders the neutral placeholder from the design until the real media
+   * exists. Drop a Lottie, inline SVG or <video> in here and nothing else
+   * needs to change.
    */
-  icon?: ReactNode;
+  media?: ReactNode;
 };
 
 const items: Friction[] = [
@@ -74,13 +75,13 @@ export function Frictions() {
   return (
     <section
       ref={root}
-      className="flex items-start bg-surface px-gutter py-section"
+      className="flex items-start bg-surface-tint px-gutter py-section"
     >
       <div className="mx-auto flex w-full max-w-canvas flex-col gap-8">
-        <div className="flex flex-col items-start gap-6">
+        <div className="flex flex-col items-start gap-3">
           <p
             data-reveal
-            className="text-fine leading-[1.1] uppercase text-ink-faint"
+            className="text-fine leading-[1.1] uppercase text-marker"
           >
             Pourquoi le flux fragmenté coûte plus cher
           </p>
@@ -92,31 +93,37 @@ export function Frictions() {
           </h2>
         </div>
 
-        <ul className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
+        {/* auto-rows-fr keeps every card the height of the tallest, so the
+            media slots line up across the row whatever the copy does. */}
+        <ul className="grid auto-rows-fr grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {items.map((item, i) => (
             <li
               key={item.title}
               data-item
-              className="flex flex-col items-start gap-6"
+              className="flex min-h-[409px] flex-col overflow-hidden rounded-xl bg-surface"
             >
-              <span
-                aria-hidden
-                className="font-display text-caption leading-[1.1] text-marker"
-              >
-                {String(i + 1).padStart(2, "0")}
-              </span>
-
-              <div className="grid size-[100px] shrink-0 place-items-center overflow-hidden rounded bg-surface-raised">
-                {item.icon}
+              <div className="grid min-h-[148px] flex-1 place-items-center overflow-hidden bg-surface-raised">
+                {item.media}
               </div>
 
-              <div className="flex flex-col items-start gap-2">
-                <h3 className="font-display text-title leading-display font-medium text-ink">
-                  {item.title}
-                </h3>
-                <p className="text-caption leading-relaxed tracking-tight text-ink-subtle">
-                  {item.body}
-                </p>
+              <div className="flex flex-1 flex-col gap-2 p-5">
+                <span
+                  aria-hidden
+                  className="font-display text-caption leading-[1.1] text-marker"
+                >
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+
+                {/* Copy sits to the bottom of its half: the titles align on
+                    their last line, where the body copy picks up. */}
+                <div className="flex flex-1 flex-col items-start justify-end gap-2">
+                  <h3 className="font-display text-title leading-display font-medium text-ink">
+                    {item.title}
+                  </h3>
+                  <p className="text-caption leading-relaxed tracking-tight text-ink-subtle">
+                    {item.body}
+                  </p>
+                </div>
               </div>
             </li>
           ))}

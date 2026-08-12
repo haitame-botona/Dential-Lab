@@ -22,8 +22,19 @@
 
   /* Chromatic hues are rationed: blue enumerates, green confirms,
      clay marks what the pack already covers at no extra cost. */
+  /* A blue so faint it reads as white — a full-bleed section wash that lets a
+     white card lift off it. Lighter than blue-50, which beds cards. */
+  --color-blue-25: #fbfdff;
+  /* The faintest blue in the system — a card bed, never type or a border. */
+  --color-blue-50: #f8fbff;
+  /* The only blue that borders rather than fills — an unticked box on a tint. */
+  --color-blue-200: #cfdcec;
   --color-blue-400: #60a5fa;
   --color-blue-500: #3b82f6;
+  /* The nav's own call-to-action once the pill turns white — the only button
+     that trades the black accent for blue, so it still reads as the entry
+     point against a page that has gone light behind it. */
+  --color-blue-600: #0067ff;
   --color-green-100: #dcfce7;
   --color-green-500: #22c55e;
   --color-clay-500: #e0533c;
@@ -67,6 +78,11 @@
 [data-theme="light"] {
   --surface: var(--color-neutral-0);
   --surface-raised: var(--color-neutral-50);
+  /* Cards that carry the accent's temperature without carrying its weight —
+     tinted just enough to lift off --surface. */
+  --surface-tint: var(--color-blue-50);
+  /* One step *below* --surface: the bed a white card sits on. */
+  --surface-sunken: var(--color-blue-25);
   --ink: var(--color-neutral-950);
   --ink-muted: --alpha(var(--color-neutral-950) / 70%);
   --ink-subtle: --alpha(var(--color-neutral-950) / 66%);
@@ -90,6 +106,10 @@
 [data-theme="dark"] {
   --surface: var(--color-neutral-950);
   --surface-raised: var(--color-neutral-900);
+  /* No blue bed on black — the tint reads as a colour cast. Lift instead. */
+  --surface-tint: var(--color-neutral-900);
+  /* On black there is nothing below --surface, so it stays put. */
+  --surface-sunken: var(--color-neutral-950);
   --ink: var(--color-neutral-0);
   --ink-muted: --alpha(var(--color-neutral-0) / 90%);
   --ink-subtle: --alpha(var(--color-neutral-0) / 66%);
@@ -107,6 +127,8 @@
 @theme inline {
   --color-surface: var(--surface);
   --color-surface-raised: var(--surface-raised);
+  --color-surface-tint: var(--surface-tint);
+  --color-surface-sunken: var(--surface-sunken);
   --color-ink: var(--ink);
   --color-ink-muted: var(--ink-muted);
   --color-ink-subtle: var(--ink-subtle);
