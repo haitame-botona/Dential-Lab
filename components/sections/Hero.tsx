@@ -1,12 +1,22 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, type CSSProperties } from "react";
 import Image from "next/image";
 import { gsap, useGSAP } from "@/lib/gsap";
 import { ease, duration } from "@/lib/motion";
 import { Button } from "@/components/ui/Button";
 
-/** Figma: linear-gradient(184.62deg, transparent 30.56%, #000 94.47%) */
+/**
+ * Figma: linear-gradient(184.62deg, transparent 30.56%, #000 94.47%).
+ *
+ * On a phone the copy block is both taller (four headline lines) and closer to
+ * the frame, so the Figma ramp only reaches full black below where the text
+ * actually starts. The mobile scrim therefore begins earlier and carries a
+ * mid-stop, putting the headline on ~85% black instead of ~45%. The desktop
+ * value is untouched.
+ */
+const SCRIM_MOBILE =
+  "linear-gradient(184.62deg, rgba(0,0,0,0) 10%, rgba(0,0,0,0.45) 45%, rgba(0,0,0,0.85) 70%, rgb(0,0,0) 92%)";
 const SCRIM =
   "linear-gradient(184.62deg, rgba(0,0,0,0) 30.557%, rgb(0,0,0) 94.471%)";
 
@@ -121,13 +131,24 @@ export function Hero() {
            matching Figma (node 16:247 is items-end with a 140px bottom inset).
            This is alignment of the CHILD — the scrim itself still fills the
            section via flex-1. */
-        className="flex flex-1 items-end justify-center px-gutter pt-gutter pb-[88px] backdrop-blur-[4px] md:pb-[140px]"
-        style={{ backgroundImage: SCRIM }}
+        /* The two ramps ride on custom properties so the breakpoint stays a
+           Tailwind variant — an inline backgroundImage could not carry one. */
+        className="flex flex-1 items-end justify-center bg-[image:var(--scrim-mobile)] px-gutter pt-gutter pb-[88px] backdrop-blur-[4px] md:bg-[image:var(--scrim)] md:pb-[140px]"
+        style={
+          {
+            "--scrim-mobile": SCRIM_MOBILE,
+            "--scrim": SCRIM,
+          } as CSSProperties
+        }
       >
         <div className="flex w-full max-w-[808px] flex-col items-center gap-3 text-center">
           <h1
             data-animate="headline"
-            className="w-full font-display text-display leading-display font-medium tracking-tight text-ink"
+            /* Breaks out of the section gutter below md and re-applies a flat
+               24px inset of its own, so the headline keeps a constant margin
+               from the screen edge while the gutter itself grows with the
+               viewport. The body copy and the CTAs stay on the gutter. */
+            className="-mx-gutter self-stretch px-6 font-display text-display leading-display font-medium tracking-tight text-ink md:mx-0 md:w-full md:px-0"
           >
             Le cas implantaire complet, planifié et produit en un seul endroit.
           </h1>
@@ -145,11 +166,15 @@ export function Hero() {
 
             <div
               data-animate="actions"
-              className="flex w-full max-w-[347px] items-center gap-3"
+              /* Stacked below sm: side by side, each pill has to take a
+                 two-line label at 320px. They go back to a row once there is
+                 width for both. */
+              className="flex w-full max-w-[347px] flex-col items-stretch gap-3 sm:flex-row sm:items-center"
             >
               <Button
                 href="#envoyer-un-cas"
                 variant="solid"
+                shape="pill"
                 className="flex-1"
                 icon={
                   <span className="flex size-[14px] shrink-0 items-center justify-center">
@@ -169,6 +194,7 @@ export function Hero() {
               <Button
                 href="#demander-un-appel"
                 variant="outline"
+                shape="pill"
                 className="flex-1"
                 icon={
                   <span className="flex size-[14px] shrink-0 items-center justify-center">
@@ -188,9 +214,11 @@ export function Hero() {
 
             <p
               data-animate="note"
-              className="text-fine leading-relaxed tracking-tight text-ink-subtle"
+              className="text-caption leading-relaxed tracking-tight text-ink-subtle"
             >
-              Sans engagement de volume. Livraison assurée partout au Maroc.
+              Sans engagement de volume.{" "}
+              <br className="sm:hidden" />
+              Livraison assurée partout au Maroc.
             </p>
           </div>
         </div>

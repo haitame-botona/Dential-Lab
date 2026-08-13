@@ -1,8 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import { useRef, type ReactNode } from "react";
-import { gsap, useGSAP } from "@/lib/gsap";
+import { useRef } from "react";
+import { gsap, ScrollTrigger, useGSAP } from "@/lib/gsap";
 import { ease, duration } from "@/lib/motion";
 
 type Differentiator = {
@@ -14,12 +14,11 @@ type Differentiator = {
    */
   icon: { src: string; width: number; height: number };
   /**
-   * Animated asset for the 184×100 slot. Left undefined for now: the slot
-   * renders the neutral placeholder from the design until the real media
-   * exists. Drop a Lottie, inline SVG or <video> in here and nothing else
-   * needs to change.
+   * Path under /public for the image filling the media slot. Left undefined
+   * until the render exists — the slot then shows the neutral placeholder from
+   * the design.
    */
-  media?: ReactNode;
+  image?: string;
 };
 
 const items: Differentiator[] = [
@@ -27,21 +26,25 @@ const items: Differentiator[] = [
     title: "Co-planifié en clinique",
     body: "Le montage clinique est validé avec vous avant tout usinage : axes, émergences, profil d'émergence.",
     icon: { src: "/icons/diff-coplanning.svg", width: 17.44, height: 21.44 },
+    image: "/media/diff-coplanning.webp",
   },
   {
     title: "Piliers personnalisés",
     body: "Titane usiné sur mesure plutôt que pilier standard retouché : ajustement passif, joint net.",
     icon: { src: "/icons/diff-abutments.svg", width: 19.44, height: 21.44 },
+    image: "/media/diff-abutments.webp",
   },
   {
     title: "Composants certifiés",
     body: "Aucune pièce générique compatible. Uniquement des bases et vis d'origine, traçables par lot.",
     icon: { src: "/icons/diff-certified.svg", width: 17.44, height: 21.44 },
+    image: "/media/diff-certified.webp",
   },
   {
     title: "Garantie clinique écrite",
     body: "Une seule contrepartie contractuelle pour la prothèse et la chirurgie guidée : durées, périmètre, remplacement.",
     icon: { src: "/icons/diff-coplanning.svg", width: 17.44, height: 21.44 },
+    image: "/media/diff-warranty.webp",
   },
 ];
 
@@ -65,8 +68,8 @@ export function Differentiators() {
             return;
           }
 
-          // The narrative order the section is written in: the claim lands
-          // first, then the evidence arrives one card at a time.
+          // Header: the claim lands first, the supporting copy follows a beat
+          // later. One timeline, fired once when the section comes into view.
           gsap
             .timeline({
               defaults: { ease: ease.outExpo, duration: duration.slow },
@@ -76,8 +79,28 @@ export function Differentiators() {
                 once: true,
               },
             })
-            .from("[data-reveal]", { y: 28, opacity: 0, stagger: 0.1 })
-            .from("[data-item]", { y: 32, opacity: 0, stagger: 0.14 }, "-=0.45");
+            .from("[data-reveal]", { y: 28, opacity: 0, stagger: 0.12 });
+
+          // Cards are NOT part of that timeline — each one waits for its own
+          // scroll position and rises as it enters. batch() groups the ones
+          // that cross the line together (e.g. on a tall viewport where two
+          // are visible at once) so they stagger instead of firing in unison.
+          const cards = gsap.utils.toArray<HTMLElement>("[data-item]");
+          gsap.set(cards, { y: 40, opacity: 0 });
+
+          ScrollTrigger.batch(cards, {
+            start: "top 88%",
+            once: true,
+            onEnter: (batch) =>
+              gsap.to(batch, {
+                y: 0,
+                opacity: 1,
+                duration: duration.slow,
+                ease: ease.outExpo,
+                stagger: 0.12,
+                overwrite: true,
+              }),
+          });
         },
       );
     },
@@ -117,24 +140,39 @@ export function Differentiators() {
           </p>
         </div>
 
-        <ul className="flex flex-col gap-6 self-start">
+        <ul className="flex flex-col gap-5 self-start">
           {items.map((item) => (
             <li
               key={item.title}
               data-item
-              className="flex items-center gap-4 overflow-hidden rounded-xl bg-surface-tint p-3"
+              className="flex flex-col gap-4 overflow-hidden rounded-xl bg-surface-tint p-3 sm:flex-row sm:items-center"
             >
-              {/* The slot narrows on small screens — at 184px it starves the
-                  copy — and stretches to the card so it never floats beside a
-                  title that has wrapped to three lines. */}
-              <div className="grid w-[104px] shrink-0 place-items-center self-stretch overflow-hidden rounded-xl bg-surface-raised sm:h-[100px] sm:w-[184px] sm:self-center">
-                {item.media}
+              {/* Mobile stacks the asset above the copy at full card width; from
+                  sm the slot sits beside it at its Figma size, 184×132. The
+                  taller 200px gives the render room to breathe at full card
+                  width on a phone.
+
+                  132px is what drives the whole right column: 132 + 24 of card
+                  padding = the 156px card height in the design, and four of
+                  those with the 20px gap add up to its 684px column. Setting it
+                  here rather than fixing the column height means a card that
+                  needs a third line of body copy grows instead of clipping. */}
+              <div className="relative h-[200px] w-full shrink-0 overflow-hidden rounded-xl bg-surface-raised sm:h-[132px] sm:w-[184px] sm:self-center">
+                {item.image ? (
+                  <Image
+                    src={item.image}
+                    alt=""
+                    fill
+                    sizes="(min-width: 640px) 184px, 100vw"
+                    className="object-cover"
+                  />
+                ) : null}
               </div>
 
               <div className="flex min-w-px flex-1 flex-col items-start gap-2">
-                {/* Start-aligned, not centred: the icon stays with the title's
-                    first line when the title wraps. */}
-                <div className="flex w-full items-start gap-3">
+                {/* Stacked: the icon sits above the title rather than beside
+                    it, so long titles get the full card width to wrap into. */}
+                <div className="flex w-full flex-col items-start gap-2">
                   <span className="grid size-6 shrink-0 place-items-center">
                     <Image
                       src={item.icon.src}

@@ -178,7 +178,9 @@ export function Deliverables() {
                 {stage.step}
               </p>
 
-              <div className="relative aspect-video w-full overflow-hidden rounded-xl bg-surface-raised lg:aspect-auto lg:h-[130px]">
+              {/* 40/27 is 16/9 with the height taken up 20%, so the stacked
+                  slot grows by the same amount as the fixed lg height. */}
+              <div className="relative aspect-[40/27] w-full overflow-hidden rounded-xl bg-surface-raised lg:aspect-auto lg:h-[156px]">
                 <Image
                   src={stage.image}
                   alt={stage.alt}

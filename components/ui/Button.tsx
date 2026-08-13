@@ -43,7 +43,7 @@ export function Button({
     <a
       href={href}
       onClick={onClick}
-      className={`inline-flex items-center justify-center gap-2 font-display text-fine font-medium tracking-tighter whitespace-nowrap transition-colors duration-(--duration-fast) ease-(--ease-out-quart) focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink ${shapes[shape]} ${variants[variant]} ${className}`}
+      className={`inline-flex items-center justify-center gap-2 font-display text-button font-medium tracking-tighter whitespace-nowrap transition-colors duration-(--duration-fast) ease-(--ease-out-quart) focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink ${shapes[shape]} ${variants[variant]} ${className}`}
     >
       {children}
       {icon}

@@ -41,14 +41,21 @@
 
   /* Fluid type scale — min at 375px viewport, max at 1440px. */
   --text-fine: clamp(0.75rem, 0.72rem + 0.13vw, 0.8125rem); /* 12 → 13 */
-  --text-sm: clamp(0.8125rem, 0.78rem + 0.14vw, 0.9375rem); /* 13 → 15 */
+  --text-sm: clamp(0.875rem, 0.853rem + 0.09vw, 0.9375rem); /* 14 → 15 */
   --text-base: clamp(0.9375rem, 0.9rem + 0.16vw, 1.0625rem); /* 15 → 17 */
-  --text-caption: clamp(0.8125rem, 0.79rem + 0.09vw, 0.875rem); /* 13 → 14 */
+  /* 14px is the floor for body copy on mobile, so this one no longer scales. */
+  --text-caption: 0.875rem; /* 14 */
   --text-label: clamp(0.875rem, 0.84rem + 0.19vw, 1rem); /* 14 → 16 */
+  /* Button labels don't scale: at 13px they stay legible on a 320px screen and
+     never grow enough to break the nav pill onto a second line. */
+  --text-button: 0.8125rem; /* 13 */
   --text-title: clamp(1.125rem, 1.06rem + 0.28vw, 1.25rem); /* 18 → 20 */
   --text-stat: clamp(2.25rem, 1.16rem + 4.66vw, 3.75rem); /* 36 → 60 */
   --text-heading: clamp(1.75rem, 1.2rem + 2.33vw, 2.5rem); /* 28 → 40 */
-  --text-display: clamp(2rem, 1.65rem + 1.5vw, 3rem); /* 32 → 48 */
+  /* The hero headline. 36px is the size at which the wrap lands closest to the
+     gutter edges on a phone — measured against Poppins Medium at
+     tracking-tight, inside a 24px inset. */
+  --text-display: clamp(2.25rem, 1.986rem + 1.13vw, 3rem); /* 36 → 48 */
 
   --tracking-tight: -0.04em;
   --tracking-tighter: -0.06em;
@@ -64,7 +71,7 @@
   --duration-slow: 900ms;
 
   /* Layout */
-  --spacing-gutter: clamp(1.25rem, -0.35rem + 6.83vw, 4.125rem); /* 20 → 66 */
+  --spacing-gutter: clamp(1.5rem, 0.0375rem + 6.24vw, 4.125rem); /* 24 → 66 */
   --spacing-section: clamp(4rem, 2.44rem + 6.67vw, 7.5rem); /* 64 → 120 */
   --container-canvas: 1440px;
 }

@@ -29,7 +29,7 @@ const EMPTY = "—";
 
 /** Card chrome, shared by the steps panel and the recap beside it. */
 const CARD =
-  "rounded-xl bg-surface p-8 shadow-[0_4px_36px_rgba(0,0,0,0.06)]";
+  "rounded-xl bg-surface p-5 shadow-[0_4px_36px_rgba(0,0,0,0.06)] sm:p-8";
 
 /** Blue ordinal over a black title — the label block fronting every step. */
 function StepLabel({ step, title }: { step: string; title: string }) {
@@ -273,11 +273,11 @@ export function Configurator() {
                         onChange={() => toggleOption(entry)}
                       />
                       <Mark on={on} />
-                      <span className="min-w-0 flex-1 font-display text-fine font-medium text-ink">
+                      <span className="min-w-0 flex-1 font-display text-caption font-medium text-ink">
                         {entry.label}
                       </span>
                       <span
-                        className={`shrink-0 text-right font-display text-fine whitespace-nowrap ${
+                        className={`shrink-0 text-right font-display text-caption whitespace-nowrap ${
                           entry.locked ? "text-included" : "text-ink"
                         }`}
                       >
@@ -293,7 +293,9 @@ export function Configurator() {
                 total would be off-screen exactly while you are changing it.
                 This bar keeps the number in view; the full card is still
                 below, unchanged. */}
-            <div className="sticky bottom-0 -mx-8 -mb-8 flex items-center justify-between gap-4 rounded-b-xl border-t border-rule bg-surface px-8 py-3 lg:hidden">
+            {/* The negative margins cancel the card's padding, so they have to
+                track it across the sm breakpoint. */}
+            <div className="sticky bottom-0 -mx-5 -mb-5 flex items-center justify-between gap-4 rounded-b-xl border-t border-rule bg-surface px-5 py-3 sm:-mx-8 sm:-mb-8 sm:px-8 lg:hidden">
               <div className="min-w-0">
                 <p className="font-body text-fine leading-[1.1] text-ink-faint uppercase">
                   Estimation
@@ -328,7 +330,7 @@ export function Configurator() {
 
             <hr className="border-t border-rule" />
 
-            <dl className="flex flex-col gap-3.5 font-display text-fine">
+            <dl className="flex flex-col gap-3.5 font-display text-caption">
               <RecapRow term="Type de cas" value={caseType?.recapLabel ?? null} />
               <RecapRow
                 term="Marque implantaire"
@@ -369,7 +371,7 @@ export function Configurator() {
                   ? "Estimation du pack complet : en attente des trois premiers choix."
                   : `Estimation du pack complet : ${formatMAD(total)}`}
               </p>
-              <p className="font-display text-fine text-ink-faint italic">
+              <p className="font-display text-caption text-ink-faint italic">
                 * Tarification indicative réservée exclusivement aux
                 professionnels cliniciens inscrits à l&apos;Ordre.
               </p>

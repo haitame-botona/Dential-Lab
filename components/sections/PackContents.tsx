@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useRef, type ReactNode } from "react";
+import { useRef } from "react";
 import { gsap, useGSAP } from "@/lib/gsap";
 import { ease } from "@/lib/motion";
 
@@ -10,33 +10,35 @@ type PackItem = {
   body: string;
   /**
    * The asset shown while this item is the one being revealed. Left undefined
-   * for now: the slot renders the neutral placeholder from the design until
-   * the real assets exist. Drop an <Image>, <video> or Lottie in here and
-   * nothing else needs to change.
+   * until the real asset exists — the slot then renders the neutral
+   * placeholder from the design.
    *
-   * Note it is mounted twice — once in the pinned cross-fade panel, once
-   * inline in the mobile list — so prefer next/image or a poster-first video
-   * over anything that autoplays on mount.
+   * It is mounted twice, once in the pinned cross-fade panel and once inline
+   * in the mobile list, so both slots stay in the DOM at every breakpoint.
    */
-  media?: ReactNode;
+  image?: string;
 };
 
 const items: PackItem[] = [
   {
     title: "Planification implanto-prothétique 3D",
     body: "Fichier de simulation chirurgicale issu du maillage de vos fichiers DICOM (CBCT) et empreinte optique (STL). Réglages d'axes optimaux validés en ligne.",
+    image: "/media/pack-planning.webp",
   },
   {
     title: "Guide chirurgical imprimé biocompatible",
     body: "Imprimé en résine chirurgicale certifiée de Classe IIa, intégrant des canons métalliques étalonnés pour votre trousse de guidée.",
+    image: "/media/pack-guide.webp",
   },
   {
     title: "Composants mécaniques d'origine",
     body: "Inclus dans chaque boîte : vis prothétique de clinique définitive, pilier personnalisé en titane d'origine ou embase titane anti-rotationnelle ajustée.",
+    image: "/media/pack-components.webp",
   },
   {
     title: "Restauration d'usage en Zircone",
     body: "Zircone monolithique multicouche à haut gradient de translucidité (1200 MPa), frittée, maquillée et glacée par nos maîtres céramistes marocains.",
+    image: "/media/pack-crown.webp",
   },
 ];
 
@@ -138,11 +140,21 @@ export function PackContents() {
               >
                 {/* Mobile carries its own asset: there is no room beside the
                     copy for a shared panel to cross-fade in. */}
-                <div className="aspect-[4/3] w-full overflow-hidden bg-surface-raised lg:hidden">
-                  {item.media}
+                <div className="relative aspect-[4/3] w-full overflow-hidden rounded-xl bg-surface-raised lg:hidden">
+                  {item.image ? (
+                    <Image
+                      src={item.image}
+                      alt=""
+                      fill
+                      sizes="100vw"
+                      className="object-cover"
+                    />
+                  ) : null}
                 </div>
 
-                <div className="flex items-center gap-3">
+                {/* Stacked: the check badge sits above the title rather than
+                    beside it, matching the Differentiators cards. */}
+                <div className="flex flex-col items-start gap-2">
                   <span
                     data-badge
                     aria-hidden
@@ -171,15 +183,23 @@ export function PackContents() {
 
         <div
           aria-hidden
-          className="relative hidden h-[min(70vh,620px)] w-full overflow-hidden bg-surface-raised lg:block"
+          className="relative hidden h-[min(70vh,620px)] w-full overflow-hidden rounded-xl bg-surface-raised lg:block"
         >
           {items.map((item) => (
             <div
               key={item.title}
               data-layer
-              className="absolute inset-0 grid place-items-center"
+              className="absolute inset-0"
             >
-              {item.media}
+              {item.image ? (
+                <Image
+                  src={item.image}
+                  alt=""
+                  fill
+                  sizes="(min-width: 1024px) 50vw, 100vw"
+                  className="object-cover"
+                />
+              ) : null}
             </div>
           ))}
         </div>

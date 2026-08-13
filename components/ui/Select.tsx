@@ -221,7 +221,7 @@ export function Select({
         aria-labelledby={`${labelledBy} ${id}`}
         onClick={() => (open ? close() : openAt())}
         onKeyDown={onTriggerKeyDown}
-        className={`flex h-[54px] w-full cursor-pointer items-center gap-2 rounded-xl border bg-surface px-4 text-left font-display text-fine tracking-tighter transition-colors duration-(--duration-fast) focus-visible:outline-2 focus-visible:-outline-offset-1 focus-visible:outline-marker ${
+        className={`flex h-[54px] w-full cursor-pointer items-center gap-2 rounded-xl border bg-surface px-4 text-left font-display text-caption tracking-tighter transition-colors duration-(--duration-fast) focus-visible:outline-2 focus-visible:-outline-offset-1 focus-visible:outline-marker ${
           open ? "border-marker" : "border-ink/[0.06] hover:border-ink/15"
         } ${selected ? "text-ink" : "text-ink/50"}`}
       >
@@ -269,7 +269,7 @@ export function Select({
                 tabIndex={-1}
                 onClick={() => commit(option)}
                 onKeyDown={(event) => onOptionKeyDown(event, index)}
-                className={`flex cursor-pointer items-start gap-4 rounded-lg p-3 font-display text-fine tracking-tighter transition-colors duration-(--duration-fast) outline-none hover:bg-surface-tint focus-visible:bg-surface-tint focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-marker ${
+                className={`flex cursor-pointer items-start gap-4 rounded-lg p-3 font-display text-caption tracking-tighter transition-colors duration-(--duration-fast) outline-none hover:bg-surface-tint focus-visible:bg-surface-tint focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-marker ${
                   on ? "bg-surface-tint" : ""
                 }`}
               >

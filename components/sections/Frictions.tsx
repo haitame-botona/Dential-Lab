@@ -1,6 +1,7 @@
 "use client";
 
-import { useRef, type ReactNode } from "react";
+import Image from "next/image";
+import { useRef } from "react";
 import { gsap, useGSAP } from "@/lib/gsap";
 import { ease, duration } from "@/lib/motion";
 
@@ -8,30 +9,33 @@ type Friction = {
   title: string;
   body: string;
   /**
-   * Animated asset filling the card's upper half. Left undefined for now: the
-   * slot renders the neutral placeholder from the design until the real media
-   * exists. Drop a Lottie, inline SVG or <video> in here and nothing else
-   * needs to change.
+   * Path under /public for the image filling the card's upper half. Left
+   * undefined until the render exists — the slot then shows the neutral
+   * placeholder from the design.
    */
-  media?: ReactNode;
+  image?: string;
 };
 
 const items: Friction[] = [
   {
     title: "La prothèse en aval",
     body: "Le projet prothétique arrive après la pose : l'axe subit la chirurgie au lieu de la servir, et la compensation se fait au fauteuil.",
+    image: "/media/friction-downstream.webp",
   },
   {
     title: "Multiplication des acteurs",
     body: "Centre d'imagerie, fournisseur de guide, laboratoire, revendeur de composants : quatre responsabilités indépendantes.",
+    image: "/media/friction-actors.webp",
   },
   {
     title: "Surtaxation des composants",
     body: "Chaque pièce est facturée à la marge d'un intermédiaire, hors du prix annoncé du cas — le budget réel se découvre à la fin.",
+    image: "/media/friction-markup.webp",
   },
   {
     title: "Points de rupture cumulés",
     body: "Chaque transfert de fichier ou de responsabilité ajoute un délai — et un litige possible dont le praticien porte seul la charge.",
+    image: "/media/friction-breakpoints.webp",
   },
 ];
 
@@ -102,14 +106,22 @@ export function Frictions() {
               data-item
               className="flex min-h-[409px] flex-col overflow-hidden rounded-xl bg-surface"
             >
-              <div className="grid min-h-[148px] flex-1 place-items-center overflow-hidden bg-surface-raised">
-                {item.media}
+              <div className="relative min-h-[148px] flex-1 overflow-hidden bg-surface-raised">
+                {item.image ? (
+                  <Image
+                    src={item.image}
+                    alt=""
+                    fill
+                    sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
+                    className="object-cover"
+                  />
+                ) : null}
               </div>
 
               <div className="flex flex-1 flex-col gap-2 p-5">
                 <span
                   aria-hidden
-                  className="font-display text-caption leading-[1.1] text-marker"
+                  className="font-display text-[2rem] leading-[1.1] text-marker"
                 >
                   {String(i + 1).padStart(2, "0")}
                 </span>

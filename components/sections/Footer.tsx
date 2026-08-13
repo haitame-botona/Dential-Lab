@@ -80,9 +80,11 @@ export function Footer() {
       <Glow className="-top-[89px] -left-[425px] size-[900px]" />
       <Glow className="-top-[103px] -right-[286px] size-[1000px]" />
 
-      <div className="relative px-5 pb-5">
+      {/* The bed inset and the card's own padding stack, so below sm they are
+          split (8 + 16) to land on the same 24px content edge as px-gutter. */}
+      <div className="relative px-2 pb-5 sm:px-5">
         <div className="mx-auto flex w-full max-w-canvas flex-col items-center overflow-hidden rounded-[20px] bg-surface">
-          <div className="flex w-full flex-col items-center gap-12 px-8 pt-12 pb-8">
+          <div className="flex w-full flex-col items-center gap-12 px-4 pt-12 pb-8 sm:px-8">
             <div className="flex w-full flex-col items-center gap-4">
               <h2
                 data-reveal
@@ -101,7 +103,12 @@ export function Footer() {
                 première planification 3D vous est proposée sans aucun engagement
                 de traitement ultérieur.
               </p>
-              <div data-reveal className="flex flex-wrap items-center justify-center gap-3">
+              <div
+                data-reveal
+                /* Stacked below sm — same pattern as the hero CTAs: full-width
+                   pills at 320px, back to a row once there is width for both. */
+                className="flex w-full max-w-[347px] flex-col items-stretch gap-3 sm:max-w-none sm:flex-row sm:flex-wrap sm:items-center sm:justify-center"
+              >
                 <Button
                   href="#configurateur"
                   shape="pill"
@@ -146,7 +153,9 @@ export function Footer() {
 
             <div
               data-reveal
-              className="flex flex-wrap items-center justify-center gap-8"
+              /* Contact line follows the CTAs: stacked and centred below sm,
+                 back to one row with the glyph between them from sm up. */
+              className="flex flex-col items-center gap-4 text-center sm:flex-row sm:flex-wrap sm:justify-center sm:gap-8"
             >
               <a
                 href={contacts[0].href}
@@ -180,8 +189,10 @@ export function Footer() {
                   "linear-gradient(270deg, rgb(254, 105, 5) 1.5%, rgb(188, 34, 131) 34.5%, rgb(105, 85, 223) 53%, rgb(53, 169, 233) 82%, rgb(230, 230, 230) 100%)",
               }}
             />
-            <div className="flex w-full flex-wrap items-center justify-between gap-2 border-t border-rule bg-surface px-gutter py-5 font-display text-[#a6a39f]">
-              <p className="min-w-0 flex-1 text-fine">
+            {/* Legal line follows the blocks above: stacked and centred below
+                sm, split to the two ends of the row from sm up. */}
+            <div className="flex w-full flex-col items-center gap-2 border-t border-rule bg-surface px-4 py-5 text-center font-display text-[#a6a39f] sm:flex-row sm:flex-wrap sm:justify-between sm:px-8 sm:text-left">
+              <p className="min-w-0 text-[10px] sm:flex-1">
                 © 2026 Dential Lab. Filiale laboratoire de{" "}
                 <span className="font-semibold text-blue-500">
                   Dential Biotech

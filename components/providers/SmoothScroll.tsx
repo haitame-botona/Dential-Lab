@@ -1,8 +1,25 @@
 "use client";
 
-import { useEffect } from "react";
+import { createContext, useContext, useEffect, useRef } from "react";
+import type { RefObject } from "react";
 import Lenis from "lenis";
 import { gsap, ScrollTrigger } from "@/lib/gsap";
+
+const LenisContext = createContext<RefObject<Lenis | null>>({ current: null });
+
+/**
+ * A ref to the page's Lenis instance rather than the instance itself: handing
+ * out the object would mean publishing it from an effect, and a setState there
+ * costs every consumer a second render on load for something none of them draw.
+ *
+ * `.current` is null until the provider's effect has run, and stays null when
+ * the visitor asked for reduced motion and scrolling was left native — so read
+ * it at the moment you need it (an event, an interaction), never during render,
+ * and handle null.
+ */
+export function useLenis() {
+  return useContext(LenisContext);
+}
 
 /**
  * Bridges Lenis to GSAP.
@@ -18,6 +35,8 @@ import { gsap, ScrollTrigger } from "@/lib/gsap";
  * otherwise desync the two.
  */
 export function SmoothScroll({ children }: { children: React.ReactNode }) {
+  const lenisRef = useRef<Lenis | null>(null);
+
   useEffect(() => {
     const prefersReducedMotion = window.matchMedia(
       "(prefers-reduced-motion: reduce)",
@@ -39,12 +58,15 @@ export function SmoothScroll({ children }: { children: React.ReactNode }) {
     gsap.ticker.add(tick);
     gsap.ticker.lagSmoothing(0);
 
+    lenisRef.current = lenis;
+
     return () => {
       gsap.ticker.remove(tick);
       gsap.ticker.lagSmoothing(500, 33); // restore GSAP's default
       lenis.destroy();
+      lenisRef.current = null;
     };
   }, []);
 
-  return <>{children}</>;
+  return <LenisContext value={lenisRef}>{children}</LenisContext>;
 }
